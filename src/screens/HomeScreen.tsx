@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React, { useCallback, useEffect } from "react";
 import {
@@ -88,9 +89,14 @@ export default function HomeScreen() {
     >
       {/* Welcome Header */}
       <View style={styles.header}>
-        <View style={styles.welcomeSection}>
-          <Text style={styles.greeting}>{getGreeting()},</Text>
-          <Text style={styles.userName}>{user?.firstName || "Guest"}</Text>
+        <View style={styles.headerContent}>
+          <View style={styles.welcomeSection}>
+            <Text style={styles.greeting}>{getGreeting()}</Text>
+            <Text style={styles.userName}>{user?.firstName || "Guest"}</Text>
+          </View>
+          <View style={styles.userIconContainer}>
+            <Ionicons name="person-circle-outline" size={40} color="#007AFF" />
+          </View>
         </View>
       </View>
 
@@ -149,21 +155,45 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: "#FFF",
     paddingTop: 48,
-    paddingBottom: 10,
+    paddingBottom: 20,
     paddingHorizontal: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  headerContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   welcomeSection: {
-    gap: 4,
+    gap: 6,
+    flex: 1,
   },
   greeting: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "500",
-    color: "#666",
+    color: "#8E8E93",
+    letterSpacing: 0.3,
   },
   userName: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: "700",
     color: "#1A1A1A",
+    letterSpacing: -0.5,
+  },
+  userIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#F0F7FF",
+    justifyContent: "center",
+    alignItems: "center",
   },
   featuredSection: {
     backgroundColor: "#FFF",

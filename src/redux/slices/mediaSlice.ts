@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import mediaService from '../../api/mediaService';
 import { Media } from '../../types/media';
+import { searchMedia } from './searchSlice';
 
 interface MediaState {
   allMedia: Media[];
@@ -156,6 +157,17 @@ const mediaSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch documentaries';
       });
+
+    // Listen to search results and add them to allMedia
+    builder.addCase(searchMedia.fulfilled, (state, action: PayloadAction<Media[]>) => {
+      // Add search results to allMedia if they don't already exist
+      const newItems = action.payload.filter(
+        (searchItem) => !state.allMedia.some((m) => m.id === searchItem.id)
+      );
+      if (newItems.length > 0) {
+        state.allMedia = [...state.allMedia, ...newItems];
+      }
+    });
   },
 });
 
