@@ -108,6 +108,11 @@ const mediaSlice = createSlice({
       .addCase(fetchMovies.fulfilled, (state, action: PayloadAction<Media[]>) => {
         state.loading = false;
         state.moviesList = action.payload;
+        // Update allMedia with unique items
+        const newItems = action.payload.filter(
+          (movie) => !state.allMedia.some((m) => m.id === movie.id)
+        );
+        state.allMedia = [...state.allMedia, ...newItems];
       })
       .addCase(fetchMovies.rejected, (state, action) => {
         state.loading = false;
@@ -122,6 +127,11 @@ const mediaSlice = createSlice({
       .addCase(fetchSeries.fulfilled, (state, action: PayloadAction<Media[]>) => {
         state.loading = false;
         state.seriesList = action.payload;
+        // Update allMedia with unique items
+        const newItems = action.payload.filter(
+          (series) => !state.allMedia.some((m) => m.id === series.id)
+        );
+        state.allMedia = [...state.allMedia, ...newItems];
       })
       .addCase(fetchSeries.rejected, (state, action) => {
         state.loading = false;
@@ -136,6 +146,11 @@ const mediaSlice = createSlice({
       .addCase(fetchDocumentaries.fulfilled, (state, action: PayloadAction<Media[]>) => {
         state.loading = false;
         state.documentariesList = action.payload;
+        // Update allMedia with unique items
+        const newItems = action.payload.filter(
+          (doc) => !state.allMedia.some((m) => m.id === doc.id)
+        );
+        state.allMedia = [...state.allMedia, ...newItems];
       })
       .addCase(fetchDocumentaries.rejected, (state, action) => {
         state.loading = false;
