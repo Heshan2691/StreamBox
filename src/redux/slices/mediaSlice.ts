@@ -49,6 +49,22 @@ export const fetchDocumentaries = createAsyncThunk('media/fetchDocumentaries', a
   return await mediaService.getMediaByType('documentary');
 });
 
+export const fetchTrailersForMedia = createAsyncThunk(
+  'media/fetchTrailers',
+  async (mediaItems: Media[]) => {
+    const itemsWithTrailers = await Promise.all(
+      mediaItems.map(async (item) => {
+        const trailerUrl = await mediaService.getTrailerUrl(
+          item.id,
+          item.type === 'documentary' ? 'movie' : item.type
+        );
+        return { ...item, trailerUrl };
+      })
+    );
+    return itemsWithTrailers;
+  }
+);
+
 const mediaSlice = createSlice({
   name: 'media',
   initialState,
@@ -167,6 +183,20 @@ const mediaSlice = createSlice({
       if (newItems.length > 0) {
         state.allMedia = [...state.allMedia, ...newItems];
       }
+    });
+
+    // Fetch trailers for media
+    builder.addCase(fetchTrailersForMedia.fulfilled, (state, action: PayloadAction<Media[]>) => {
+      // Update trendingMedia with trailer URLs
+      state.trendingMedia = action.payload;
+      
+      // Also update allMedia with trailer URLs
+      action.payload.forEach((mediaWithTrailer) => {
+        const index = state.allMedia.findIndex((m) => m.id === mediaWithTrailer.id);
+        if (index !== -1) {
+          state.allMedia[index] = mediaWithTrailer;
+        }
+      });
     });
   },
 });

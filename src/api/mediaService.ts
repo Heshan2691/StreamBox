@@ -134,6 +134,48 @@ class MediaService {
 
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
+  // Fetch trailer URL for a media item
+  async getTrailerUrl(
+    mediaId: string,
+    mediaType: "movie" | "series"
+  ): Promise<string | undefined> {
+    try {
+      const endpoint =
+        mediaType === "movie"
+          ? `${TMDB_BASE_URL}/movie/${mediaId}/videos`
+          : `${TMDB_BASE_URL}/tv/${mediaId}/videos`;
+
+      const response = await axios.get(endpoint, {
+        params: {
+          api_key: TMDB_API_KEY,
+          language: "en-US",
+        },
+      });
+
+      // Find trailer in results (prefer Official Trailer, then any Trailer, then Teaser)
+      const videos = response.data.results || [];
+      const trailer =
+        videos.find(
+          (v: any) =>
+            v.type === "Trailer" &&
+            v.site === "YouTube" &&
+            v.name.toLowerCase().includes("official")
+        ) ||
+        videos.find((v: any) => v.type === "Trailer" && v.site === "YouTube") ||
+        videos.find((v: any) => v.type === "Teaser" && v.site === "YouTube");
+
+      if (trailer) {
+        // Return YouTube video URL
+        return `https://www.youtube.com/watch?v=${trailer.key}`;
+      }
+
+      return undefined;
+    } catch (error) {
+      console.error("Error fetching trailer:", error);
+      return undefined;
+    }
+  }
+
   async getAllMedia(): Promise<Media[]> {
     const [movies, series] = await Promise.all([
       this.getMediaByType("movie"),

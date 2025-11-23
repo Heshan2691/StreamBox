@@ -14,6 +14,7 @@ import MediaDetailScreen from "../screens/MediaDetailScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import SearchScreen from "../screens/SearchScreen";
+import VideoPlayerScreen from "../screens/VideoPlayerScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -134,6 +135,15 @@ export default function RootNavigator() {
             name="MediaDetail"
             component={MediaDetailScreen}
             options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="VideoPlayer"
+            component={VideoPlayerScreen}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+              animation: "slide_from_bottom",
+            }}
           />
         </>
       )}

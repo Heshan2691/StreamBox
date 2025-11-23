@@ -3,6 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useCallback, useEffect } from "react";
 import {
   ActivityIndicator,
+  FlatList,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -12,6 +13,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { CategoryRow } from "../components/CategoryRow";
 import { FeaturedBanner } from "../components/FeaturedBanner";
+import { TrailerCard } from "../components/TrailerCard";
 import {
   selectCurrentUserFavorites,
   toggleFavorite,
@@ -21,6 +23,7 @@ import {
   fetchFeaturedMedia,
   fetchMovies,
   fetchSeries,
+  fetchTrailersForMedia,
   fetchTrendingMedia,
 } from "../redux/slices/mediaSlice";
 import { AppDispatch, RootState } from "../redux/store";
@@ -56,6 +59,13 @@ export default function HomeScreen() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Fetch trailers for trending media after they're loaded
+  useEffect(() => {
+    if (trendingMedia.length > 0 && !trendingMedia[0].trailerUrl) {
+      dispatch(fetchTrailersForMedia(trendingMedia.slice(0, 5)));
+    }
+  }, [trendingMedia, dispatch]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -118,7 +128,34 @@ export default function HomeScreen() {
           favoriteIds={favoriteIds}
           onToggleFavorite={handleToggleFavorite}
         />
+      </View>
 
+      {/* Latest Trailers Section */}
+      {trendingMedia.length > 0 && (
+        <View style={styles.trailersSection}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="videocam" size={24} color="#007AFF" />
+            <Text style={styles.sectionTitle}>Latest Trailers</Text>
+          </View>
+          <FlatList
+            data={trendingMedia.slice(0, 5)}
+            renderItem={({ item }) => (
+              <TrailerCard
+                media={item}
+                onPress={() =>
+                  (navigation as any).navigate("VideoPlayer", { media: item })
+                }
+              />
+            )}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.trailersList}
+          />
+        </View>
+      )}
+
+      <View style={styles.content}>
         <CategoryRow
           title="Popular Movies"
           data={moviesList.slice(0, 10)}
@@ -198,6 +235,26 @@ const styles = StyleSheet.create({
   featuredSection: {
     backgroundColor: "#FFF",
     marginTop: 8,
+  },
+  trailersSection: {
+    backgroundColor: "#FFF",
+    marginTop: 8,
+    paddingVertical: 24,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    marginLeft: 8,
+  },
+  trailersList: {
+    paddingHorizontal: 20,
   },
   content: {
     backgroundColor: "#FFF",
