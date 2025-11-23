@@ -63,12 +63,12 @@ export default function MediaDetailScreen() {
       ]);
       setMedia(mediaData);
       setReviews(reviewsData);
-      
+
       // Fetch similar media after getting media details
       if (mediaData) {
         const similarMedia = await mediaService.getSimilarMedia(
           mediaId,
-          mediaData.type === 'documentary' ? 'movie' : mediaData.type
+          mediaData.type === "documentary" ? "movie" : mediaData.type
         );
         setRecommendations(similarMedia);
       }
