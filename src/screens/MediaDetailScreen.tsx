@@ -41,6 +41,7 @@ export default function MediaDetailScreen() {
 
   const [media, setMedia] = useState<Media | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [recommendations, setRecommendations] = useState<Media[]>([]);
   const [loading, setLoading] = useState(true);
   const [showReviewForm, setShowReviewForm] = useState(false);
 
@@ -62,6 +63,15 @@ export default function MediaDetailScreen() {
       ]);
       setMedia(mediaData);
       setReviews(reviewsData);
+      
+      // Fetch similar media after getting media details
+      if (mediaData) {
+        const similarMedia = await mediaService.getSimilarMedia(
+          mediaId,
+          mediaData.type === 'documentary' ? 'movie' : mediaData.type
+        );
+        setRecommendations(similarMedia);
+      }
     } catch {
       Alert.alert("Error", "Failed to load media details");
     } finally {
@@ -237,11 +247,42 @@ export default function MediaDetailScreen() {
                 <Text style={styles.infoValue}>{media.director}</Text>
               </View>
             )}
-            <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>Cast</Text>
-              <Text style={styles.infoValue}>{media.cast.join(", ")}</Text>
-            </View>
           </View>
+
+          {/* Cast Section */}
+          {media.cast && media.cast.length > 0 && (
+            <View style={styles.castSection}>
+              <Text style={styles.sectionTitle}>Cast</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.castScroll}
+              >
+                {media.cast.map((member: any, index: number) => {
+                  const isCastMember = typeof member === "object";
+                  return (
+                    <View key={index} style={styles.castCard}>
+                      {isCastMember && member.profileUrl && (
+                        <Image
+                          source={{ uri: member.profileUrl }}
+                          style={styles.castImage}
+                          resizeMode="cover"
+                        />
+                      )}
+                      <Text style={styles.castName} numberOfLines={2}>
+                        {isCastMember ? member.name : member}
+                      </Text>
+                      {isCastMember && member.character && (
+                        <Text style={styles.castCharacter} numberOfLines={2}>
+                          {member.character}
+                        </Text>
+                      )}
+                    </View>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
         </View>
 
         {/* Reviews Section */}
@@ -341,6 +382,45 @@ export default function MediaDetailScreen() {
             </View>
           ))}
         </View>
+
+        {/* Recommendations Section */}
+        {recommendations.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>You May Also Like</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.recommendationsScroll}
+            >
+              {recommendations.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.recommendationCard}
+                  onPress={() => {
+                    (navigation as any).navigate("MediaDetail", {
+                      mediaId: item.id,
+                    });
+                  }}
+                >
+                  <Image
+                    source={{ uri: item.posterUrl }}
+                    style={styles.recommendationImage}
+                    resizeMode="cover"
+                  />
+                  <Text style={styles.recommendationTitle} numberOfLines={2}>
+                    {item.title}
+                  </Text>
+                  <View style={styles.recommendationRating}>
+                    <Ionicons name="star" size={12} color="#FFD700" />
+                    <Text style={styles.recommendationRatingText}>
+                      {item.rating.toFixed(1)}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
 
         <View style={styles.bottomPadding} />
       </View>
@@ -599,6 +679,66 @@ const styles = StyleSheet.create({
   reviewDate: {
     fontSize: 12,
     color: "#999",
+  },
+  castSection: {
+    marginTop: 24,
+    marginBottom: 24,
+  },
+  castScroll: {
+    marginTop: 12,
+  },
+  castCard: {
+    width: 120,
+    marginRight: 12,
+    alignItems: "center",
+  },
+  castImage: {
+    width: 120,
+    height: 180,
+    borderRadius: 8,
+    backgroundColor: "#F0F0F0",
+    marginBottom: 8,
+  },
+  castName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1A1A1A",
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  castCharacter: {
+    fontSize: 12,
+    color: "#666",
+    textAlign: "center",
+  },
+  recommendationsScroll: {
+    marginTop: 12,
+  },
+  recommendationCard: {
+    width: 140,
+    marginRight: 12,
+  },
+  recommendationImage: {
+    width: 140,
+    height: 210,
+    borderRadius: 8,
+    backgroundColor: "#F0F0F0",
+    marginBottom: 8,
+  },
+  recommendationTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1A1A1A",
+    marginBottom: 4,
+  },
+  recommendationRating: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  recommendationRatingText: {
+    fontSize: 12,
+    color: "#666",
   },
   bottomPadding: {
     height: 32,

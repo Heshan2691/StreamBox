@@ -1,3 +1,9 @@
+export interface CastMember {
+  name: string;
+  character?: string;
+  profileUrl?: string;
+}
+
 export interface Media {
   id: string;
   title: string;
@@ -12,7 +18,7 @@ export interface Media {
   seasons?: number; // for series
   episodes?: number; // for series
   director?: string;
-  cast: string[];
+  cast: string[] | CastMember[]; // Support both formats
   trailerUrl?: string;
   isFeatured?: boolean;
 }
