@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Colors } from "../../constants/theme";
+import { useAppTheme } from "../hooks/useAppTheme";
 
 interface SearchBarProps {
   value: string;
@@ -21,27 +23,32 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onClear,
   placeholder = "Search movies, series, documentaries...",
 }) => {
+  const { isDark } = useAppTheme();
+  const colors = isDark ? Colors.dark : Colors.light;
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { backgroundColor: colors.inputBackground }]}
+    >
       <Ionicons
         name="search"
         size={20}
-        color="#999"
+        color={colors.icon}
         style={styles.searchIcon}
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, { color: colors.text }]}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor="#999"
+        placeholderTextColor={colors.placeholderText}
         returnKeyType="search"
         autoCapitalize="none"
         autoCorrect={false}
       />
       {value.length > 0 && (
         <TouchableOpacity onPress={onClear} style={styles.clearButton}>
-          <Ionicons name="close-circle" size={20} color="#999" />
+          <Ionicons name="close-circle" size={20} color={colors.icon} />
         </TouchableOpacity>
       )}
     </View>

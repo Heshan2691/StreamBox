@@ -2,8 +2,10 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { Colors } from "../../constants/theme";
 import { CategoryRow } from "../components/CategoryRow";
 import { SearchBar } from "../components/SearchBar";
+import { useAppTheme } from "../hooks/useAppTheme";
 import {
   selectCurrentUserFavorites,
   toggleFavorite,
@@ -20,6 +22,8 @@ export default function SearchScreen() {
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation();
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const { isDark } = useAppTheme();
+  const colors = isDark ? Colors.dark : Colors.light;
 
   const { query, results, loading } = useSelector(
     (state: RootState) => state.search
@@ -57,7 +61,7 @@ export default function SearchScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <SearchBar
         value={query}
         onChangeText={handleSearchChange}
@@ -66,14 +70,16 @@ export default function SearchScreen() {
 
       {loading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       )}
 
       {!loading && query.trim().length === 0 && (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>Search for Content</Text>
-          <Text style={styles.emptyText}>
+          <Text style={[styles.emptyTitle, { color: colors.text }]}>
+            Search for Content
+          </Text>
+          <Text style={[styles.emptyText, { color: colors.icon }]}>
             Find your favorite movies, series, and documentaries
           </Text>
         </View>
@@ -81,8 +87,10 @@ export default function SearchScreen() {
 
       {!loading && query.trim().length > 0 && results.length === 0 && (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>No Results Found</Text>
-          <Text style={styles.emptyText}>
+          <Text style={[styles.emptyTitle, { color: colors.text }]}>
+            No Results Found
+          </Text>
+          <Text style={[styles.emptyText, { color: colors.icon }]}>
             Try searching with different keywords
           </Text>
         </View>

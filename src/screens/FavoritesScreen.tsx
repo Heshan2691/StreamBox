@@ -2,7 +2,9 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { useSelector } from "react-redux";
+import { Colors } from "../../constants/theme";
 import { MediaCard } from "../components/MediaCard";
+import { useAppTheme } from "../hooks/useAppTheme";
 import { selectCurrentUserFavorites } from "../redux/slices/favoritesSlice";
 import { selectCurrentUserWatchlist } from "../redux/slices/watchlistSlice";
 import { RootState } from "../redux/store";
@@ -11,6 +13,8 @@ import { Media } from "../types/media";
 export default function FavoritesScreen() {
   const navigation = useNavigation();
   const [, setRefreshKey] = useState(0);
+  const { isDark } = useAppTheme();
+  const colors = isDark ? Colors.dark : Colors.light;
 
   const { allMedia } = useSelector((state: RootState) => state.media);
   const favoriteIds = useSelector(selectCurrentUserFavorites);
@@ -39,7 +43,9 @@ export default function FavoritesScreen() {
 
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionHeader}>{title}</Text>
+        <Text style={[styles.sectionHeader, { color: colors.text }]}>
+          {title}
+        </Text>
         <View style={styles.grid}>
           {mediaList.map((media) => (
             <View key={media.id} style={styles.cardWrapper}>
@@ -57,10 +63,12 @@ export default function FavoritesScreen() {
 
   if (favoriteMedia.length === 0 && watchlistMedia.length === 0) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>No Favorites Yet</Text>
-          <Text style={styles.emptyText}>
+          <Text style={[styles.emptyTitle, { color: colors.text }]}>
+            No Favorites Yet
+          </Text>
+          <Text style={[styles.emptyText, { color: colors.icon }]}>
             Start adding your favorite content to see them here
           </Text>
         </View>
@@ -69,7 +77,7 @@ export default function FavoritesScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
         data={[1]} // Dummy data to enable scrolling
         renderItem={() => (

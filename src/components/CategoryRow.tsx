@@ -1,5 +1,7 @@
 import React from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
+import { Colors } from "../../constants/theme";
+import { useAppTheme } from "../hooks/useAppTheme";
 import { Media } from "../types/media";
 import { MediaCard } from "./MediaCard";
 
@@ -20,11 +22,14 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
   onToggleFavorite,
   horizontal = true,
 }) => {
+  const { isDark } = useAppTheme();
+  const colors = isDark ? Colors.dark : Colors.light;
+
   if (data.length === 0) return null;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
       <FlatList
         data={data}
         renderItem={({ item }) => (

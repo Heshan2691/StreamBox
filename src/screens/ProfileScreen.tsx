@@ -10,8 +10,11 @@ import {
   View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { Colors } from "../../constants/theme";
+import { useAppTheme } from "../hooks/useAppTheme";
 import { logoutUser } from "../redux/slices/authSlice";
 import { selectCurrentUserFavorites } from "../redux/slices/favoritesSlice";
+import { setThemeMode, ThemeMode } from "../redux/slices/themeSlice";
 import {
   addFavoriteGenre,
   removeFavoriteGenre,
@@ -38,6 +41,9 @@ const AVAILABLE_GENRES = [
 
 export default function ProfileScreen() {
   const dispatch = useDispatch<AppDispatch>();
+  const { isDark, mode } = useAppTheme();
+  const colors = isDark ? Colors.dark : Colors.light;
+
   const { user } = useSelector((state: RootState) => state.auth);
   const { preferences } = useSelector((state: RootState) => state.user);
   const favoriteIds = useSelector(selectCurrentUserFavorites);
@@ -62,48 +68,174 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleThemeChange = (newMode: ThemeMode) => {
+    dispatch(setThemeMode(newMode));
+  };
+
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Profile Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
         {user?.image ? (
           <Image source={{ uri: user.image }} style={styles.avatar} />
         ) : (
-          <View style={styles.avatarPlaceholder}>
-            <Ionicons name="person" size={48} color="#007AFF" />
+          <View
+            style={[
+              styles.avatarPlaceholder,
+              { backgroundColor: isDark ? "#1a3a52" : "#E8F4FF" },
+            ]}
+          >
+            <Ionicons name="person" size={48} color={colors.primary} />
           </View>
         )}
-        <Text style={styles.userName}>
+        <Text style={[styles.userName, { color: colors.text }]}>
           {user?.firstName} {user?.lastName}
         </Text>
-        <Text style={styles.userEmail}>@{user?.username}</Text>
-        <Text style={styles.userEmailSecondary}>{user?.email}</Text>
+        <Text style={[styles.userEmail, { color: colors.primary }]}>
+          @{user?.username}
+        </Text>
+        <Text style={[styles.userEmailSecondary, { color: colors.icon }]}>
+          {user?.email}
+        </Text>
       </View>
 
       {/* Stats */}
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{favoriteIds.length}</Text>
-          <Text style={styles.statLabel}>Favorites</Text>
+          <Text style={[styles.statValue, { color: colors.primary }]}>
+            {favoriteIds.length}
+          </Text>
+          <Text style={[styles.statLabel, { color: colors.icon }]}>
+            Favorites
+          </Text>
         </View>
-        <View style={styles.statDivider} />
+        <View
+          style={[styles.statDivider, { backgroundColor: colors.border }]}
+        />
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{watchlistItems.length}</Text>
-          <Text style={styles.statLabel}>Watchlist</Text>
+          <Text style={[styles.statValue, { color: colors.primary }]}>
+            {watchlistItems.length}
+          </Text>
+          <Text style={[styles.statLabel, { color: colors.icon }]}>
+            Watchlist
+          </Text>
         </View>
-        <View style={styles.statDivider} />
+        <View
+          style={[styles.statDivider, { backgroundColor: colors.border }]}
+        />
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>
+          <Text style={[styles.statValue, { color: colors.primary }]}>
             {preferences.watchHistory.length}
           </Text>
-          <Text style={styles.statLabel}>Watched</Text>
+          <Text style={[styles.statLabel, { color: colors.icon }]}>
+            Watched
+          </Text>
+        </View>
+      </View>
+
+      {/* Theme Settings */}
+      <View style={[styles.section, { borderTopColor: colors.border }]}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Theme Settings
+        </Text>
+        <Text style={[styles.sectionDescription, { color: colors.icon }]}>
+          Choose your preferred color theme
+        </Text>
+        <View style={styles.themeContainer}>
+          <TouchableOpacity
+            style={[
+              styles.themeOption,
+              {
+                backgroundColor: colors.cardBackground,
+                borderColor: colors.border,
+              },
+              mode === "light" && styles.themeOptionSelected,
+              mode === "light" && { borderColor: colors.primary },
+            ]}
+            onPress={() => handleThemeChange("light")}
+          >
+            <Ionicons
+              name="sunny"
+              size={24}
+              color={mode === "light" ? colors.primary : colors.icon}
+            />
+            <Text style={[styles.themeText, { color: colors.text }]}>
+              Light
+            </Text>
+            {mode === "light" && (
+              <Ionicons
+                name="checkmark-circle"
+                size={20}
+                color={colors.primary}
+              />
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.themeOption,
+              {
+                backgroundColor: colors.cardBackground,
+                borderColor: colors.border,
+              },
+              mode === "dark" && styles.themeOptionSelected,
+              mode === "dark" && { borderColor: colors.primary },
+            ]}
+            onPress={() => handleThemeChange("dark")}
+          >
+            <Ionicons
+              name="moon"
+              size={24}
+              color={mode === "dark" ? colors.primary : colors.icon}
+            />
+            <Text style={[styles.themeText, { color: colors.text }]}>Dark</Text>
+            {mode === "dark" && (
+              <Ionicons
+                name="checkmark-circle"
+                size={20}
+                color={colors.primary}
+              />
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.themeOption,
+              {
+                backgroundColor: colors.cardBackground,
+                borderColor: colors.border,
+              },
+              mode === "auto" && styles.themeOptionSelected,
+              mode === "auto" && { borderColor: colors.primary },
+            ]}
+            onPress={() => handleThemeChange("auto")}
+          >
+            <Ionicons
+              name="phone-portrait"
+              size={24}
+              color={mode === "auto" ? colors.primary : colors.icon}
+            />
+            <Text style={[styles.themeText, { color: colors.text }]}>Auto</Text>
+            {mode === "auto" && (
+              <Ionicons
+                name="checkmark-circle"
+                size={20}
+                color={colors.primary}
+              />
+            )}
+          </TouchableOpacity>
         </View>
       </View>
 
       {/* Favorite Genres */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Favorite Genres</Text>
-        <Text style={styles.sectionDescription}>
+      <View style={[styles.section, { borderTopColor: colors.border }]}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Favorite Genres
+        </Text>
+        <Text style={[styles.sectionDescription, { color: colors.icon }]}>
           Select your favorite genres to get personalized recommendations
         </Text>
         <View style={styles.genresContainer}>
@@ -114,14 +246,15 @@ export default function ProfileScreen() {
                 key={genre}
                 style={[
                   styles.genreChip,
-                  isSelected && styles.genreChipSelected,
+                  { backgroundColor: isDark ? "#2a2a2a" : "#F5F5F5" },
+                  isSelected && { backgroundColor: colors.primary },
                 ]}
                 onPress={() => handleToggleGenre(genre)}
               >
                 <Text
                   style={[
                     styles.genreText,
-                    isSelected && styles.genreTextSelected,
+                    { color: isSelected ? "#FFF" : colors.icon },
                   ]}
                 >
                   {genre}
@@ -136,12 +269,20 @@ export default function ProfileScreen() {
       </View>
 
       {/* App Info */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>About StreamBox</Text>
-        <View style={styles.infoCard}>
-          <Text style={styles.infoText}>Version 1.0.0</Text>
-          <Text style={styles.infoText}>Entertainment & Media App</Text>
-          <Text style={styles.infoDescription}>
+      <View style={[styles.section, { borderTopColor: colors.border }]}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          About StreamBox
+        </Text>
+        <View
+          style={[styles.infoCard, { backgroundColor: colors.cardBackground }]}
+        >
+          <Text style={[styles.infoText, { color: colors.text }]}>
+            Version 1.0.0
+          </Text>
+          <Text style={[styles.infoText, { color: colors.text }]}>
+            Entertainment & Media App
+          </Text>
+          <Text style={[styles.infoDescription, { color: colors.icon }]}>
             Discover and explore your favorite movies, series, and
             documentaries. Save favorites, create watchlists, and never miss
             great content.
@@ -150,7 +291,7 @@ export default function ProfileScreen() {
       </View>
 
       {/* Logout Button */}
-      <View style={styles.section}>
+      <View style={[styles.section, { borderTopColor: colors.border }]}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Ionicons name="log-out-outline" size={24} color="#FF4458" />
           <Text style={styles.logoutText}>Logout</Text>
@@ -297,6 +438,25 @@ const styles = StyleSheet.create({
   },
   genreTextSelected: {
     color: "#FFF",
+  },
+  themeContainer: {
+    gap: 12,
+  },
+  themeOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 2,
+    gap: 12,
+  },
+  themeOptionSelected: {
+    borderWidth: 2,
+  },
+  themeText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: "600",
   },
   infoCard: {
     backgroundColor: "#F8F8F8",

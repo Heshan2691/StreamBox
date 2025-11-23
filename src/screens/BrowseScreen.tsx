@@ -8,7 +8,9 @@ import {
   View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { Colors } from "../../constants/theme";
 import { CategoryRow } from "../components/CategoryRow";
+import { useAppTheme } from "../hooks/useAppTheme";
 import {
   selectCurrentUserFavorites,
   toggleFavorite,
@@ -28,6 +30,8 @@ export default function BrowseScreen() {
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation();
   const [selectedFilter, setSelectedFilter] = useState<FilterType>("all");
+  const { isDark } = useAppTheme();
+  const colors = isDark ? Colors.dark : Colors.light;
 
   const { moviesList, seriesList, documentariesList } = useSelector(
     (state: RootState) => state.media
@@ -70,8 +74,16 @@ export default function BrowseScreen() {
   ];
 
   return (
-    <View style={styles.container}>
-      <View style={styles.filterWrapper}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View
+        style={[
+          styles.filterWrapper,
+          {
+            backgroundColor: colors.cardBackground,
+            borderBottomColor: colors.border,
+          },
+        ]}
+      >
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -82,14 +94,18 @@ export default function BrowseScreen() {
               key={filter.type}
               style={[
                 styles.filterButton,
-                selectedFilter === filter.type && styles.filterButtonActive,
+                { backgroundColor: isDark ? "#2a2a2a" : "#F5F5F5" },
+                selectedFilter === filter.type && {
+                  backgroundColor: colors.primary,
+                },
               ]}
               onPress={() => setSelectedFilter(filter.type)}
             >
               <Text
                 style={[
                   styles.filterText,
-                  selectedFilter === filter.type && styles.filterTextActive,
+                  { color: colors.icon },
+                  selectedFilter === filter.type && { color: "#FFF" },
                 ]}
               >
                 {filter.label}

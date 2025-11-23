@@ -17,6 +17,8 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
+import { Colors } from "../../constants/theme";
+import { useAppTheme } from "../hooks/useAppTheme";
 import { clearError, loginUser } from "../redux/slices/authSlice";
 import { AppDispatch, RootState } from "../redux/store";
 
@@ -35,6 +37,12 @@ export default function LoginScreen() {
   const { isLoading, error, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
   );
+  const { isDark } = useAppTheme();
+  const colors = isDark ? Colors.dark : Colors.light;
+
+  const gradientColors: [string, string, string] = isDark
+    ? ["#1a1a1a", "#0a0a0a", "#000000"]
+    : ["#007AFF", "#0051D5", "#003DA5"];
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -60,10 +68,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={["#007AFF", "#0051D5", "#003DA5"]}
-      style={styles.gradient}
-    >
+    <LinearGradient colors={gradientColors} style={styles.gradient}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -181,14 +186,14 @@ export default function LoginScreen() {
             )}
           </Formik>
 
-          <View style={styles.demoInfo}>
+          {/* <View style={styles.demoInfo}>
             <Text style={styles.demoTitle}>Demo Credentials:</Text>
             <Text style={styles.demoText}>Username: emilys</Text>
             <Text style={styles.demoText}>Password: emilyspass</Text>
             <Text style={styles.demoNote}>
               (Using DummyJSON API for authentication)
             </Text>
-          </View>
+          </View> */}
         </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>

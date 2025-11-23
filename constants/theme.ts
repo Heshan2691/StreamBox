@@ -16,6 +16,22 @@ export const Colors = {
     icon: '#687076',
     tabIconDefault: '#687076',
     tabIconSelected: tintColorLight,
+    
+    // App-specific colors
+    primary: '#E50914',
+    secondary: '#564d4d',
+    accent: '#FFD700',
+    cardBackground: '#FFFFFF',
+    headerBackground: '#1a1a1a',
+    inputBackground: '#f5f5f5',
+    inputBorder: '#ddd',
+    placeholderText: '#999',
+    error: '#ff0000',
+    success: '#00ff00',
+    border: '#e0e0e0',
+    shadow: '#000',
+    overlay: 'rgba(0, 0, 0, 0.5)',
+    buttonText: '#FFFFFF',
   },
   dark: {
     text: '#ECEDEE',
@@ -24,6 +40,22 @@ export const Colors = {
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
+    
+    // App-specific colors
+    primary: '#E50914',
+    secondary: '#8c8c8c',
+    accent: '#FFD700',
+    cardBackground: '#1f1f1f',
+    headerBackground: '#0a0a0a',
+    inputBackground: '#2a2a2a',
+    inputBorder: '#444',
+    placeholderText: '#666',
+    error: '#ff4444',
+    success: '#44ff44',
+    border: '#333',
+    shadow: '#000',
+    overlay: 'rgba(0, 0, 0, 0.7)',
+    buttonText: '#FFFFFF',
   },
 };
 

@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Colors } from "../../constants/theme";
+import { useAppTheme } from "../hooks/useAppTheme";
 import { Media } from "../types/media";
 
 interface MediaCardProps {
@@ -26,6 +28,9 @@ export const MediaCard: React.FC<MediaCardProps> = ({
   isFavorite = false,
   onToggleFavorite,
 }) => {
+  const { isDark } = useAppTheme();
+  const colors = isDark ? Colors.dark : Colors.light;
+
   return (
     <TouchableOpacity
       style={styles.container}
@@ -59,12 +64,14 @@ export const MediaCard: React.FC<MediaCardProps> = ({
         </View>
       </View>
       <View style={styles.info}>
-        <Text style={styles.title} numberOfLines={2}>
+        <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
           {media.title}
         </Text>
-        <Text style={styles.year}>{media.releaseYear}</Text>
+        <Text style={[styles.year, { color: colors.icon }]}>
+          {media.releaseYear}
+        </Text>
         <View style={styles.typeContainer}>
-          <Text style={styles.typeText}>
+          <Text style={[styles.typeText, { color: colors.primary }]}>
             {media.type === "movie"
               ? "Movie"
               : media.type === "series"

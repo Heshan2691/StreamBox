@@ -6,6 +6,7 @@ import authReducer from './slices/authSlice';
 import favoritesReducer, { clearFavorites, setCurrentUser as setFavoritesUser } from './slices/favoritesSlice';
 import mediaReducer from './slices/mediaSlice';
 import searchReducer from './slices/searchSlice';
+import themeReducer from './slices/themeSlice';
 import userReducer from './slices/userSlice';
 import watchlistReducer, { clearWatchlist, setCurrentUser as setWatchlistUser } from './slices/watchlistSlice';
 
@@ -17,7 +18,7 @@ const storage = Platform.OS === 'web'
 const persistConfig = {
   key: 'root',
   storage: storage,
-  whitelist: ['favorites', 'watchlist', 'user'], // Only persist these reducers - auth uses SecureStore
+  whitelist: ['favorites', 'watchlist', 'user', 'theme'], // Only persist these reducers - auth uses SecureStore
 };
 
 const rootReducer = combineReducers({
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
   watchlist: watchlistReducer,
   search: searchReducer,
   user: userReducer,
+  theme: themeReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -47,6 +47,16 @@ A complete entertainment platform featuring real-time movie/TV show data, traile
 - **Auto-Play**: Trailers automatically start when opened
 - **Latest Trailers Section**: Horizontal scrolling carousel of trending trailers
 
+### 🌓 Dark Mode Theme System (Bonus Feature)
+
+- **Theme Toggle**: Switch between Light, Dark, and Auto modes
+- **System Integration**: Auto mode follows device system preferences
+- **Persistent Theme**: Theme preference saved across app sessions
+- **Complete Coverage**: All screens and components support dark mode
+- **Dynamic Colors**: Carefully crafted color palettes for both themes
+- **Instant Switching**: Theme changes apply instantly without restart
+- **Accessible UI**: Maintains excellent readability and contrast in both modes
+
 ### ❤️ Personalization
 
 - **Favorites Management**: Quick add/remove favorites with visual feedback
@@ -372,6 +382,24 @@ Actions:
 - clearSearch()
 ```
 
+#### 6. **themeSlice** - Theme Management (Bonus Feature)
+
+```typescript
+State: {
+  mode: 'light' | 'dark' | 'auto'
+  isDark: boolean
+}
+
+Actions:
+- setThemeMode(mode)
+- setIsDark(isDark)
+
+Features:
+- Persistent theme preference
+- Auto mode follows system settings
+- Instant theme switching
+```
+
 ### Data Persistence Strategy
 
 **Persisted Data** (via Redux Persist):
@@ -380,6 +408,7 @@ Actions:
 - ✅ User-specific favorites
 - ✅ User-specific watchlists
 - ✅ User preferences
+- ✅ Theme preference (Bonus Feature)
 
 **Non-Persisted Data** (fetched fresh):
 
@@ -393,11 +422,23 @@ Actions:
 
 ### Color Scheme
 
-- **Primary**: #007AFF (iOS Blue)
-- **Background**: #F8F9FA (Light Gray)
+**Light Mode:**
+
+- **Primary**: #E50914 (StreamBox Red)
+- **Background**: #FFFFFF (White)
 - **Cards**: #FFFFFF (White)
-- **Text Primary**: #1A1A1A
-- **Text Secondary**: #8E8E93
+- **Text Primary**: #11181C
+- **Text Secondary**: #687076
+- **Input Background**: #F5F5F5
+
+**Dark Mode:** (Bonus Feature)
+
+- **Primary**: #E50914 (StreamBox Red)
+- **Background**: #151718 (Dark)
+- **Cards**: #1F1F1F (Dark Gray)
+- **Text Primary**: #ECEDEE (Light)
+- **Text Secondary**: #9BA1A6
+- **Input Background**: #2A2A2A
 - **Error**: #FF3B30
 - **Success**: #34C759
 - **Warning**: #FFD700
@@ -577,7 +618,7 @@ App Root
 ### Core Requirements
 
 - ✅ **Topic**: Entertainment & Media Streaming
-- ✅ **State Management**: Redux Toolkit with 5 slices
+- ✅ **State Management**: Redux Toolkit with 6 slices
 - ✅ **Data Persistence**: Redux Persist with AsyncStorage
 - ✅ **Navigation**: React Navigation (Tab + Stack navigators)
 - ✅ **Form Validation**: Formik + Yup (Login, Register, Reviews)
@@ -589,12 +630,21 @@ App Root
 ### Bonus Features (5 Marks)
 
 - ✅ **Video Trailer System**: Real trailer playback with TMDB integration
+
   - YouTube iframe player integration
   - Real trailer fetching from TMDB API
   - Latest Trailers section on Home screen
   - Full-screen video player modal
   - Auto-play functionality
   - Fallback to demo videos
+
+- ✅ **Dark Mode Theme System**: Complete theme customization
+  - Light, Dark, and Auto theme modes
+  - System preference integration (Auto mode)
+  - Persistent theme across sessions
+  - All screens and components themed
+  - Instant theme switching
+  - Optimized color palettes for accessibility
 
 ### Additional Features Implemented
 
@@ -636,9 +686,9 @@ App Root
 - [ ] Push notifications for new content
 - [ ] Social features (share, comments)
 - [ ] Multi-language support
-- [ ] Dark mode theme
 - [ ] Content filtering by rating/year
 - [ ] Advanced recommendation algorithm
+- [ ] Chromecast/AirPlay support
 
 ---
 

@@ -16,6 +16,8 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
+import { Colors } from "../../constants/theme";
+import { useAppTheme } from "../hooks/useAppTheme";
 import { clearError, registerUser } from "../redux/slices/authSlice";
 import { AppDispatch, RootState } from "../redux/store";
 
@@ -53,6 +55,8 @@ export default function RegisterScreen() {
   const { isLoading, error, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
   );
+  const { isDark } = useAppTheme();
+  const colors = isDark ? Colors.dark : Colors.light;
 
   useEffect(() => {
     if (isAuthenticated) {

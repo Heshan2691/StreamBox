@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { Colors } from "../../constants/theme";
+import { useAppTheme } from "../hooks/useAppTheme";
 import { loadStoredAuth } from "../redux/slices/authSlice";
 import { AppDispatch, RootState } from "../redux/store";
 import BrowseScreen from "../screens/BrowseScreen";
@@ -20,15 +22,23 @@ const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function TabNavigator() {
+  const { isDark } = useAppTheme();
+  const colors = isDark ? Colors.dark : Colors.light;
+
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: "#007AFF",
-        tabBarInactiveTintColor: "#999",
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.icon,
         tabBarStyle: {
+          backgroundColor: colors.cardBackground,
           borderTopWidth: 1,
-          borderTopColor: "#F0F0F0",
+          borderTopColor: colors.border,
         },
+        headerStyle: {
+          backgroundColor: colors.cardBackground,
+        },
+        headerTintColor: colors.text,
       }}
     >
       <Tab.Screen
@@ -94,6 +104,8 @@ export default function RootNavigator() {
   const { isAuthenticated, isLoading } = useSelector(
     (state: RootState) => state.auth
   );
+  const { isDark } = useAppTheme();
+  const colors = isDark ? Colors.dark : Colors.light;
 
   useEffect(() => {
     dispatch(loadStoredAuth());
@@ -101,8 +113,15 @@ export default function RootNavigator() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#007AFF" />
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: colors.background,
+        }}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }

@@ -11,9 +11,11 @@ import {
   View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { Colors } from "../../constants/theme";
 import { CategoryRow } from "../components/CategoryRow";
 import { FeaturedBanner } from "../components/FeaturedBanner";
 import { TrailerCard } from "../components/TrailerCard";
+import { useAppTheme } from "../hooks/useAppTheme";
 import {
   selectCurrentUserFavorites,
   toggleFavorite,
@@ -33,6 +35,8 @@ export default function HomeScreen() {
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = React.useState(false);
+  const { isDark } = useAppTheme();
+  const colors = isDark ? Colors.dark : Colors.light;
 
   const { featuredMedia, trendingMedia, moviesList, seriesList, loading } =
     useSelector((state: RootState) => state.media);
@@ -83,35 +87,58 @@ export default function HomeScreen() {
 
   if (loading && !featuredMedia.length) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: colors.background },
+        ]}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       showsVerticalScrollIndicator={false}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
       {/* Welcome Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.cardBackground }]}>
         <View style={styles.headerContent}>
           <View style={styles.welcomeSection}>
-            <Text style={styles.greeting}>{getGreeting()}</Text>
-            <Text style={styles.userName}>{user?.firstName || "Guest"}</Text>
+            <Text style={[styles.greeting, { color: colors.icon }]}>
+              {getGreeting()}
+            </Text>
+            <Text style={[styles.userName, { color: colors.text }]}>
+              {user?.firstName || "Guest"}
+            </Text>
           </View>
-          <View style={styles.userIconContainer}>
-            <Ionicons name="person-circle-outline" size={40} color="#007AFF" />
+          <View
+            style={[
+              styles.userIconContainer,
+              { backgroundColor: isDark ? "#1a3a52" : "#F0F7FF" },
+            ]}
+          >
+            <Ionicons
+              name="person-circle-outline"
+              size={40}
+              color={colors.primary}
+            />
           </View>
         </View>
       </View>
 
       {featuredMedia.length > 0 && (
-        <View style={styles.featuredSection}>
+        <View
+          style={[
+            styles.featuredSection,
+            { backgroundColor: colors.cardBackground },
+          ]}
+        >
           <FeaturedBanner
             media={featuredMedia[0]}
             onPress={() => handleMediaPress(featuredMedia[0])}
@@ -120,7 +147,9 @@ export default function HomeScreen() {
         </View>
       )}
 
-      <View style={styles.content}>
+      <View
+        style={[styles.content, { backgroundColor: colors.cardBackground }]}
+      >
         <CategoryRow
           title="Trending Now"
           data={trendingMedia}
@@ -132,10 +161,17 @@ export default function HomeScreen() {
 
       {/* Latest Trailers Section */}
       {trendingMedia.length > 0 && (
-        <View style={styles.trailersSection}>
+        <View
+          style={[
+            styles.trailersSection,
+            { backgroundColor: colors.cardBackground },
+          ]}
+        >
           <View style={styles.sectionHeader}>
-            <Ionicons name="videocam" size={24} color="#007AFF" />
-            <Text style={styles.sectionTitle}>Latest Trailers</Text>
+            <Ionicons name="videocam" size={24} color={colors.primary} />
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              Latest Trailers
+            </Text>
           </View>
           <FlatList
             data={trendingMedia.slice(0, 5)}
@@ -155,7 +191,9 @@ export default function HomeScreen() {
         </View>
       )}
 
-      <View style={styles.content}>
+      <View
+        style={[styles.content, { backgroundColor: colors.cardBackground }]}
+      >
         <CategoryRow
           title="Popular Movies"
           data={moviesList.slice(0, 10)}
