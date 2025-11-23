@@ -5,12 +5,16 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
+  Text,
   View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { CategoryRow } from "../components/CategoryRow";
 import { FeaturedBanner } from "../components/FeaturedBanner";
-import { toggleFavorite } from "../redux/slices/favoritesSlice";
+import {
+  selectCurrentUserFavorites,
+  toggleFavorite,
+} from "../redux/slices/favoritesSlice";
 import {
   fetchAllMedia,
   fetchFeaturedMedia,
@@ -28,7 +32,15 @@ export default function HomeScreen() {
 
   const { featuredMedia, trendingMedia, moviesList, seriesList, loading } =
     useSelector((state: RootState) => state.media);
-  const { favoriteIds } = useSelector((state: RootState) => state.favorites);
+  const favoriteIds = useSelector(selectCurrentUserFavorites);
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+  };
 
   const loadData = useCallback(async () => {
     await Promise.all([
@@ -74,37 +86,49 @@ export default function HomeScreen() {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
+      {/* Welcome Header */}
+      <View style={styles.header}>
+        <View style={styles.welcomeSection}>
+          <Text style={styles.greeting}>{getGreeting()},</Text>
+          <Text style={styles.userName}>{user?.firstName || "Guest"}</Text>
+        </View>
+      </View>
+
       {featuredMedia.length > 0 && (
-        <FeaturedBanner
-          media={featuredMedia[0]}
-          onPress={() => handleMediaPress(featuredMedia[0])}
-          onPlayPress={() => handleMediaPress(featuredMedia[0])}
-        />
+        <View style={styles.featuredSection}>
+          <FeaturedBanner
+            media={featuredMedia[0]}
+            onPress={() => handleMediaPress(featuredMedia[0])}
+            onPlayPress={() => handleMediaPress(featuredMedia[0])}
+          />
+        </View>
       )}
 
-      <CategoryRow
-        title="Trending Now"
-        data={trendingMedia}
-        onMediaPress={handleMediaPress}
-        favoriteIds={favoriteIds}
-        onToggleFavorite={handleToggleFavorite}
-      />
+      <View style={styles.content}>
+        <CategoryRow
+          title="Trending Now"
+          data={trendingMedia}
+          onMediaPress={handleMediaPress}
+          favoriteIds={favoriteIds}
+          onToggleFavorite={handleToggleFavorite}
+        />
 
-      <CategoryRow
-        title="Popular Movies"
-        data={moviesList.slice(0, 10)}
-        onMediaPress={handleMediaPress}
-        favoriteIds={favoriteIds}
-        onToggleFavorite={handleToggleFavorite}
-      />
+        <CategoryRow
+          title="Popular Movies"
+          data={moviesList.slice(0, 10)}
+          onMediaPress={handleMediaPress}
+          favoriteIds={favoriteIds}
+          onToggleFavorite={handleToggleFavorite}
+        />
 
-      <CategoryRow
-        title="Top Series"
-        data={seriesList.slice(0, 10)}
-        onMediaPress={handleMediaPress}
-        favoriteIds={favoriteIds}
-        onToggleFavorite={handleToggleFavorite}
-      />
+        <CategoryRow
+          title="Top Series"
+          data={seriesList.slice(0, 10)}
+          onMediaPress={handleMediaPress}
+          favoriteIds={favoriteIds}
+          onToggleFavorite={handleToggleFavorite}
+        />
+      </View>
 
       <View style={styles.bottomPadding} />
     </ScrollView>
@@ -114,15 +138,43 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF",
+    backgroundColor: "#F8F9FA",
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#F8F9FA",
+  },
+  header: {
     backgroundColor: "#FFF",
+    paddingTop: 48,
+    paddingBottom: 10,
+    paddingHorizontal: 20,
+  },
+  welcomeSection: {
+    gap: 4,
+  },
+  greeting: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#666",
+  },
+  userName: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#1A1A1A",
+  },
+  featuredSection: {
+    backgroundColor: "#FFF",
+    marginTop: 8,
+  },
+  content: {
+    backgroundColor: "#FFF",
+    marginTop: 8,
+    paddingTop: 8,
   },
   bottomPadding: {
-    height: 32,
+    height: 24,
   },
 });

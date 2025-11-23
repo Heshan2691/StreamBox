@@ -4,7 +4,10 @@ import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { CategoryRow } from "../components/CategoryRow";
 import { SearchBar } from "../components/SearchBar";
-import { toggleFavorite } from "../redux/slices/favoritesSlice";
+import {
+  selectCurrentUserFavorites,
+  toggleFavorite,
+} from "../redux/slices/favoritesSlice";
 import {
   clearSearch,
   searchMedia,
@@ -21,7 +24,7 @@ export default function SearchScreen() {
   const { query, results, loading } = useSelector(
     (state: RootState) => state.search
   );
-  const { favoriteIds } = useSelector((state: RootState) => state.favorites);
+  const favoriteIds = useSelector(selectCurrentUserFavorites);
 
   useEffect(() => {
     const timer = setTimeout(() => {

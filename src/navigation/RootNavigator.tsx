@@ -1,12 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import React from "react";
+import React, { useEffect } from "react";
+import { ActivityIndicator, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { loadStoredAuth } from "../redux/slices/authSlice";
+import { AppDispatch, RootState } from "../redux/store";
 import BrowseScreen from "../screens/BrowseScreen";
 import FavoritesScreen from "../screens/FavoritesScreen";
 import HomeScreen from "../screens/HomeScreen";
+import LoginScreen from "../screens/LoginScreen";
 import MediaDetailScreen from "../screens/MediaDetailScreen";
 import ProfileScreen from "../screens/ProfileScreen";
+import RegisterScreen from "../screens/RegisterScreen";
 import SearchScreen from "../screens/SearchScreen";
 
 const Tab = createBottomTabNavigator();
@@ -83,18 +89,54 @@ function TabNavigator() {
 }
 
 export default function RootNavigator() {
+  const dispatch = useDispatch<AppDispatch>();
+  const { isAuthenticated, isLoading } = useSelector(
+    (state: RootState) => state.auth
+  );
+
+  useEffect(() => {
+    dispatch(loadStoredAuth());
+  }, [dispatch]);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
+
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="Main"
-        component={TabNavigator}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="MediaDetail"
-        component={MediaDetailScreen}
-        options={{ headerShown: false }}
-      />
+      {!isAuthenticated ? (
+        // Auth Stack
+        <>
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Register"
+            component={RegisterScreen}
+            options={{ headerShown: false }}
+          />
+        </>
+      ) : (
+        // Main App Stack
+        <>
+          <Stack.Screen
+            name="Main"
+            component={TabNavigator}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="MediaDetail"
+            component={MediaDetailScreen}
+            options={{ headerShown: false }}
+          />
+        </>
+      )}
     </Stack.Navigator>
   );
 }

@@ -16,9 +16,15 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 import mediaService from "../api/mediaService";
-import { toggleFavorite } from "../redux/slices/favoritesSlice";
+import {
+  selectCurrentUserFavorites,
+  toggleFavorite,
+} from "../redux/slices/favoritesSlice";
 import { addToWatchHistory } from "../redux/slices/userSlice";
-import { toggleWatchlist } from "../redux/slices/watchlistSlice";
+import {
+  selectCurrentUserWatchlist,
+  toggleWatchlist,
+} from "../redux/slices/watchlistSlice";
 import { AppDispatch, RootState } from "../redux/store";
 import { Media, Review } from "../types/media";
 
@@ -45,11 +51,9 @@ export default function MediaDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [showReviewForm, setShowReviewForm] = useState(false);
 
-  const { favoriteIds } = useSelector((state: RootState) => state.favorites);
-  const { items: watchlistItems } = useSelector(
-    (state: RootState) => state.watchlist
-  );
-  const { userName } = useSelector((state: RootState) => state.user);
+  const favoriteIds = useSelector(selectCurrentUserFavorites);
+  const watchlistItems = useSelector(selectCurrentUserWatchlist);
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const isFavorite = favoriteIds.includes(mediaId);
   const isInWatchlist = watchlistItems.some((item) => item.mediaId === mediaId);
@@ -91,8 +95,8 @@ export default function MediaDetailScreen() {
     try {
       const newReview = await mediaService.addReview({
         mediaId,
-        userId: "user1",
-        userName,
+        userId: user?.id.toString() || "user1",
+        userName: user?.username || "Guest",
         rating: values.rating,
         comment: values.comment,
       });

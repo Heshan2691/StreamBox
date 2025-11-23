@@ -2,11 +2,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { Platform } from 'react-native';
 import { persistReducer, persistStore } from 'redux-persist';
-import favoritesReducer from './slices/favoritesSlice';
+import authReducer from './slices/authSlice';
+import favoritesReducer, { clearFavorites, setCurrentUser as setFavoritesUser } from './slices/favoritesSlice';
 import mediaReducer from './slices/mediaSlice';
 import searchReducer from './slices/searchSlice';
 import userReducer from './slices/userSlice';
-import watchlistReducer from './slices/watchlistSlice';
+import watchlistReducer, { clearWatchlist, setCurrentUser as setWatchlistUser } from './slices/watchlistSlice';
 
 // Use localStorage for web, AsyncStorage for native
 const storage = Platform.OS === 'web' 
@@ -16,10 +17,11 @@ const storage = Platform.OS === 'web'
 const persistConfig = {
   key: 'root',
   storage: storage,
-  whitelist: ['favorites', 'watchlist', 'user'], // Only persist these reducers
+  whitelist: ['favorites', 'watchlist', 'user'], // Only persist these reducers - auth uses SecureStore
 };
 
 const rootReducer = combineReducers({
+  auth: authReducer,
   media: mediaReducer,
   favorites: favoritesReducer,
   watchlist: watchlistReducer,
@@ -37,6 +39,34 @@ export const store = configureStore({
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
       },
     }),
+});
+
+// Middleware to sync user changes with favorites and watchlist
+store.subscribe(() => {
+  const state = store.getState();
+  
+  // Check if state is properly initialized
+  if (!state.auth || !state.favorites || !state.watchlist) {
+    return;
+  }
+  
+  const userId = state.auth.user?.id.toString() || null;
+  const currentFavoritesUserId = state.favorites.currentUserId;
+  const currentWatchlistUserId = state.watchlist.currentUserId;
+
+  // When auth state changes, update favorites and watchlist current user
+  if (userId !== currentFavoritesUserId) {
+    store.dispatch(setFavoritesUser(userId));
+  }
+  if (userId !== currentWatchlistUserId) {
+    store.dispatch(setWatchlistUser(userId));
+  }
+
+  // Clear when logged out
+  if (!userId && (currentFavoritesUserId || currentWatchlistUserId)) {
+    store.dispatch(clearFavorites());
+    store.dispatch(clearWatchlist());
+  }
 });
 
 export const persistor = persistStore(store);

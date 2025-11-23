@@ -2,20 +2,22 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
   Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "../redux/slices/authSlice";
+import { selectCurrentUserFavorites } from "../redux/slices/favoritesSlice";
 import {
   addFavoriteGenre,
   removeFavoriteGenre,
-  setUserName,
 } from "../redux/slices/userSlice";
-import { RootState } from "../redux/store";
+import { selectCurrentUserWatchlist } from "../redux/slices/watchlistSlice";
+import { AppDispatch, RootState } from "../redux/store";
 
 const AVAILABLE_GENRES = [
   "Action",
@@ -35,25 +37,21 @@ const AVAILABLE_GENRES = [
 ];
 
 export default function ProfileScreen() {
-  const dispatch = useDispatch();
-  const { userName, preferences } = useSelector(
-    (state: RootState) => state.user
-  );
-  const { favoriteIds } = useSelector((state: RootState) => state.favorites);
-  const { items: watchlistItems } = useSelector(
-    (state: RootState) => state.watchlist
-  );
+  const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: RootState) => state.auth);
+  const { preferences } = useSelector((state: RootState) => state.user);
+  const favoriteIds = useSelector(selectCurrentUserFavorites);
+  const watchlistItems = useSelector(selectCurrentUserWatchlist);
 
-  const [editingName, setEditingName] = React.useState(false);
-  const [tempName, setTempName] = React.useState(userName);
-
-  const handleSaveName = () => {
-    if (tempName.trim().length > 0) {
-      dispatch(setUserName(tempName.trim()));
-      setEditingName(false);
-    } else {
-      Alert.alert("Error", "Name cannot be empty");
-    }
+  const handleLogout = () => {
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: () => dispatch(logoutUser()),
+      },
+    ]);
   };
 
   const handleToggleGenre = (genre: string) => {
@@ -68,44 +66,18 @@ export default function ProfileScreen() {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Profile Header */}
       <View style={styles.header}>
-        <View style={styles.avatar}>
-          <Ionicons name="person" size={48} color="#007AFF" />
-        </View>
-        {editingName ? (
-          <View style={styles.nameEditContainer}>
-            <TextInput
-              style={styles.nameInput}
-              value={tempName}
-              onChangeText={setTempName}
-              autoFocus
-            />
-            <TouchableOpacity
-              onPress={handleSaveName}
-              style={styles.saveButton}
-            >
-              <Ionicons name="checkmark" size={24} color="#007AFF" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setTempName(userName);
-                setEditingName(false);
-              }}
-              style={styles.cancelButton}
-            >
-              <Ionicons name="close" size={24} color="#FF4458" />
-            </TouchableOpacity>
-          </View>
+        {user?.image ? (
+          <Image source={{ uri: user.image }} style={styles.avatar} />
         ) : (
-          <View style={styles.nameContainer}>
-            <Text style={styles.userName}>{userName}</Text>
-            <TouchableOpacity
-              onPress={() => setEditingName(true)}
-              style={styles.editButton}
-            >
-              <Ionicons name="pencil" size={20} color="#007AFF" />
-            </TouchableOpacity>
+          <View style={styles.avatarPlaceholder}>
+            <Ionicons name="person" size={48} color="#007AFF" />
           </View>
         )}
+        <Text style={styles.userName}>
+          {user?.firstName} {user?.lastName}
+        </Text>
+        <Text style={styles.userEmail}>@{user?.username}</Text>
+        <Text style={styles.userEmailSecondary}>{user?.email}</Text>
       </View>
 
       {/* Stats */}
@@ -177,6 +149,14 @@ export default function ProfileScreen() {
         </View>
       </View>
 
+      {/* Logout Button */}
+      <View style={styles.section}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={24} color="#FF4458" />
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.bottomPadding} />
     </ScrollView>
   );
@@ -202,6 +182,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 16,
   },
+  avatarPlaceholder: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#E8F4FF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
   nameContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -211,6 +200,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "700",
     color: "#1A1A1A",
+    marginBottom: 4,
+  },
+  userEmail: {
+    fontSize: 16,
+    color: "#007AFF",
+    marginBottom: 4,
+  },
+  userEmailSecondary: {
+    fontSize: 14,
+    color: "#666",
   },
   editButton: {
     padding: 4,
@@ -314,6 +313,23 @@ const styles = StyleSheet.create({
     color: "#666",
     lineHeight: 20,
     marginTop: 8,
+  },
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFF",
+    borderWidth: 2,
+    borderColor: "#FF4458",
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    gap: 8,
+  },
+  logoutText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#FF4458",
   },
   bottomPadding: {
     height: 32,

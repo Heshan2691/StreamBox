@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { useSelector } from "react-redux";
 import { MediaCard } from "../components/MediaCard";
+import { selectCurrentUserFavorites } from "../redux/slices/favoritesSlice";
+import { selectCurrentUserWatchlist } from "../redux/slices/watchlistSlice";
 import { RootState } from "../redux/store";
 import { Media } from "../types/media";
 
@@ -11,10 +13,8 @@ export default function FavoritesScreen() {
   const [, setRefreshKey] = useState(0);
 
   const { allMedia } = useSelector((state: RootState) => state.media);
-  const { favoriteIds } = useSelector((state: RootState) => state.favorites);
-  const { items: watchlistItems } = useSelector(
-    (state: RootState) => state.watchlist
-  );
+  const favoriteIds = useSelector(selectCurrentUserFavorites);
+  const watchlistItems = useSelector(selectCurrentUserWatchlist);
 
   // Force refresh when screen comes into focus
   useFocusEffect(
@@ -34,28 +34,23 @@ export default function FavoritesScreen() {
     (navigation as any).navigate("MediaDetail", { mediaId: media.id });
   };
 
-  // Combine data with section headers
-  const sections = [];
-  if (favoriteMedia.length > 0) {
-    sections.push({ type: "header", title: "My Favorites" });
-    sections.push(...favoriteMedia.map((media) => ({ type: "item", media })));
-  }
-  if (watchlistMedia.length > 0) {
-    sections.push({ type: "header", title: "My Watchlist" });
-    sections.push(...watchlistMedia.map((media) => ({ type: "item", media })));
-  }
+  const renderMediaGrid = (mediaList: Media[], title: string) => {
+    if (mediaList.length === 0) return null;
 
-  const renderItem = ({ item }: any) => {
-    if (item.type === "header") {
-      return <Text style={styles.sectionHeader}>{item.title}</Text>;
-    }
     return (
-      <View style={styles.cardWrapper}>
-        <MediaCard
-          media={item.media}
-          onPress={() => handleMediaPress(item.media)}
-          isFavorite={favoriteIds.includes(item.media.id)}
-        />
+      <View style={styles.section}>
+        <Text style={styles.sectionHeader}>{title}</Text>
+        <View style={styles.grid}>
+          {mediaList.map((media) => (
+            <View key={media.id} style={styles.cardWrapper}>
+              <MediaCard
+                media={media}
+                onPress={() => handleMediaPress(media)}
+                isFavorite={favoriteIds.includes(media.id)}
+              />
+            </View>
+          ))}
+        </View>
       </View>
     );
   };
@@ -76,14 +71,15 @@ export default function FavoritesScreen() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={sections}
-        renderItem={renderItem}
-        keyExtractor={(item: any, index) =>
-          item.type === "header" ? `header-${index}` : `item-${item.media.id}`
-        }
-        numColumns={2}
+        data={[1]} // Dummy data to enable scrolling
+        renderItem={() => (
+          <View>
+            {renderMediaGrid(favoriteMedia, "My Favorites")}
+            {renderMediaGrid(watchlistMedia, "My Watchlist")}
+          </View>
+        )}
+        keyExtractor={() => "favorites-list"}
         contentContainerStyle={styles.listContent}
-        columnWrapperStyle={styles.columnWrapper}
         showsVerticalScrollIndicator={false}
       />
     </View>
@@ -99,9 +95,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 32,
   },
-  columnWrapper: {
-    justifyContent: "space-between",
-    marginBottom: 16,
+  section: {
+    marginBottom: 24,
   },
   sectionHeader: {
     fontSize: 20,
@@ -109,10 +104,15 @@ const styles = StyleSheet.create({
     color: "#1A1A1A",
     marginTop: 16,
     marginBottom: 16,
-    width: "100%",
+  },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   cardWrapper: {
     width: "48%",
+    marginBottom: 16,
   },
   emptyContainer: {
     flex: 1,
