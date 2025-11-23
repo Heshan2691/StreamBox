@@ -11,6 +11,13 @@ A modern, feature-rich React Native entertainment and media streaming applicatio
 
 A complete entertainment platform featuring real-time movie/TV show data, trailer playback, user authentication, and personalized content management.
 
+<div align="center">
+  <img src="./assets/screenshots/33129354-47b9-40f8-aa70-480a74363ae4.jpg" alt="StreamBox Screenshot 1" width="250"/>
+  <img src="./assets/screenshots/927abd79-fa07-4281-913c-2916eb2eca09.jpg" alt="StreamBox Screenshot 2" width="250"/>
+  <img src="./assets/screenshots/e3e1deee-8fc3-4706-87ae-2a69d54d930f.jpg" alt="StreamBox Screenshot 3" width="250"/>
+  <img src="./assets/screenshots/WhatsApp Image 2025-11-23 at 15.23.01.jpeg" alt="StreamBox Screenshot 4" width="250"/>
+</div>
+
 ---
 
 ## ✨ Key Features
